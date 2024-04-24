@@ -1,25 +1,32 @@
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
+const sql = require('mssql');
 
 app.use(express.json());
 
-const sql = require('mssql');
 
 app.get('/', async (req, res) => {
   res.send('API reached');
 });
 
+
+// Returns all employees in the database
 app.get('/Employee', async (req, res) => {
   ret = await query(`SELECT * FROM dbo.EMPLOYEE;`);
   res.send(ret);
 });
 
+
+// Returns all projects in the database
 app.get('/Project', async (req, res) => {
   ret = await query(`SELECT * FROM dbo.PROJECT;`);
   res.send(ret);
 });
 
+
+// Returns the description of all projects that the employee is working
+// on. The parameter is the employee id
 app.get('/Employee/Project/:id', async (req, res) => {
   const id = req.params.id;
   ret = await query(
@@ -28,12 +35,13 @@ app.get('/Employee/Project/:id', async (req, res) => {
   res.send(ret);
 });
 
+
 const config = {
-  user: 'workwise-backend-server-admin', // better stored in an app setting such as process.env.DB_USER
-  password: 'projectpassword1@3', // better stored in an app setting such as process.env.DB_PASSWORD
-  server: 'workwise-backend-server.database.windows.net', // better stored in an app setting such as process.env.DB_SERVER
-  port: 1433, // optional, defaults to 1433, better stored in an app setting such as process.env.DB_PORT
-  database: 'workwise-backend-database', // better stored in an app setting such as process.env.DB_NAME
+  user: 'workwise-backend-server-admin', 
+  password: 'projectpassword1@3', 
+  server: 'workwise-backend-server.database.windows.net', 
+  port: 1433, 
+  database: 'workwise-backend-database', 
   authentication: {
     type: 'default'
   },
@@ -41,6 +49,7 @@ const config = {
     encrypt: true
   }
 }
+
 
 async function query(query) {
   try {
@@ -52,6 +61,7 @@ async function query(query) {
     return err.message;
   }
 }
+
 
 app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
