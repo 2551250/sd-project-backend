@@ -66,7 +66,7 @@ app.post("/Project", async (req, res) => {
   const { manager_id } = req.body;
   const { estimated_time } = req.body;
   ret = await query(
-    `INSERT INTO dbo.PROJECT (PROJECT_NAME, DESCRIPTION, MANAGER_ID, ESTIMATED_TIME) VALUES (${project_name}, '${description}', '${manager_id}', ${estimated_time})`
+    `INSERT INTO dbo.PROJECT (PROJECT_NAME, DESCRIPTION, MANAGER_ID, ESTIMATED_TIME) VALUES ('${project_name}', '${description}', '${manager_id}', ${estimated_time})`
   );
   if (ret === undefined) {
     res.status(201).send("Project succesfully creeated");
