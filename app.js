@@ -71,7 +71,7 @@ app.post("/Project", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Project succesfully creeated");
   } else {
-    res.status(400).send("Error");
+    res.status(400).send(ret);
   }
 });
 
