@@ -76,13 +76,14 @@ app.post("/Project", async (req, res) => {
 });
 
 // Inserts a new review into the review table 
-// Request body is the emp_proj_id, the id of the person sending the review and the review itself
+// Request body is the id of the person sending the review, the id of the person recieving the review, the review itself and the project id
 app.post("/Review", async (req, res) =>{
-  const { emp_proj_id } = req.body;
+  const { review_of } = req.body;
   const { review_by } = req.body;
   const { description } = req.body;
+  const { project_id } = req.body;
   ret = await query(
-    `INSERT INTO dbo.REVIEW (EMP_PROJ_ID, REVIEW_BY, DESCRIPTION) VALUES (${emp_proj_id}, ${review_by}, '${description}')`
+    `INSERT INTO dbo.REVIEW (REVIEW_BY, REVIEW_OF, DESCRIPTION, PROJECT_ID) VALUES (${review_by}, ${review_of}, '${description}', ${project_id})`
   );
   if (ret === undefined) {
     res.status(201).send("Review successfully created");
@@ -106,16 +107,26 @@ app.post("/EmployeeProject", async (req, res) => {
   }
 });
 
-// Returns all the reviews written the user
+// Returns all the reviews written by the user
 // The parameter is the employee id
-app.get("/Review/:id", async (req, res) =>{
+app.get("/CreatedReviews/:id", async (req, res) =>{
   const { id } = req.params;
   ret = await query(
-    `SELECT REVIEW_ID, DESCRIPTION FROM dbo.REVIEW INNER JOIN dbo.EMPLOYEE_PROJECT ON REVIEW.EMP_PROJ_ID = EMPLOYEE_PROJECT.EMP_PROJ_ID WHERE EMPLOYEE_ID = ${id}`
+    `SELECT * FROM dbo.REVIEW WHERE REVIEW_BY = ${id}`
   );
   res.status(200).send(ret);
 }
 );
+
+// Returns all the reviews written of a user
+// The parameter is the employee id
+app.get("/ReceivedReviews/:id", async (req, res) =>{
+  const { id } = req.params;
+  ret = await query(
+    `SELECT * FROM dbo.REVIEW WHERE REVIEW_OF = ${id}`
+  );
+  res.status(200).send(ret);
+})
 
 // Updates the time spent on a project 
 // Body consists of project_id, employee_id and time_spent
