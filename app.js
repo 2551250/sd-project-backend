@@ -71,7 +71,7 @@ app.post("/Project", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Project succesfully creeated");
   } else {
-    res.status(400).send(req.body);
+    res.status(400).send("Error, project not created");
   }
 });
 
@@ -87,7 +87,7 @@ app.post("/Review", async (req, res) =>{
   if (ret === undefined) {
     res.status(201).send("Review successfully created");
   } else {
-    res.status(400).send("Error review not created");
+    res.status(400).send("Error, review not created");
   }
 });
 
