@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const sql = require('mssql');
 
 app.use(express.json());
@@ -146,15 +146,14 @@ app.put("/EmployeeProject", async (req, res) => {
 
 // Returns conflicting times 
 // Body consists of employee_id, project_id, data, start_time and end_time
-app.get("/Time", async (req, res) =>{
+app.post("/GetTime", async (req, res) =>{
   const { employee_id } = req.body;
   const { project_id } = req.body;
   const { date } = req.body;
   const { start_time } = req.body;
   const { end_time } = req.body;
-
   ret = await query(
-    `SELECT * FROM dbo.TIMES WHERE (EMPLOYEE_ID = ${employee_id} AND PROJECT_ID = ${project_id} AND DATE = \'${date}\') AND ((START_TIME <= \'${start_time}\' AND END_TIME >= \'${end_time}\') OR (START_TIME < \'${start_time}\' AND \'${start_time}\' < END_TIME) OR (START_TIME < \'${end_time}\' AND \'${end_time}\' < END_TIME) OR (\'${start_time}\' < START_TIME AND \'${end_time}\' > END_TIME))`
+    `SELECT * FROM dbo.TIMES WHERE (EMPLOYEE_ID = ${employee_id} AND PROJECT_ID = ${project_id} AND DATE = '${date}') AND ((START_TIME <= '${start_time}' AND END_TIME >= '${end_time}') OR (START_TIME < '${start_time}' AND '${start_time}' < END_TIME) OR (START_TIME < '${end_time}' AND '${end_time}' < END_TIME) OR ('${start_time}' < START_TIME AND '${end_time}' > END_TIME))`
   );
   res.status(200).send(ret)
 });
