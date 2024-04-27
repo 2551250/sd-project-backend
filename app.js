@@ -71,7 +71,7 @@ app.post("/Project", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Project succesfully creeated");
   } else {
-    res.status(400).send(ret);
+    res.status(400).send(req.body);
   }
 });
 
@@ -95,7 +95,7 @@ app.post("/Review", async (req, res) =>{
 // The request body is the staff_id and the project_id
 app.post("/EmployeeProject", async (req, res) => {
   const { project_id } = req.body;
-  const { staff_id } = req.params;
+  const { staff_id } = req.body;
   ret = await query(
     `INSERT INTO dbo.EMPLOYEE_PROJECT (PROJECT_ID, STAFF_ID, TIME_SPENT) VALUES (${project_id}, ${staff_id}, 0)`
   );
