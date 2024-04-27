@@ -85,9 +85,9 @@ app.post("/Review", async (req, res) =>{
     `INSERT INTO dbo.REVIEW (EMP_PROJ_ID, REVIEW_BY, DESCRIPTION) VALUES (${emp_proj_id}, ${review_by}, '${description}')`
   );
   if (ret === undefined) {
-    res.status(201).send("Project succesfully created");
+    res.status(201).send("Review successfully created");
   } else {
-    res.status(400).send("Error");
+    res.status(400).send("Error review not created");
   }
 });
 
@@ -97,12 +97,12 @@ app.post("/EmployeeProject", async (req, res) => {
   const { project_id } = req.body;
   const { staff_id } = req.body;
   ret = await query(
-    `INSERT INTO dbo.EMPLOYEE_PROJECT (PROJECT_ID, STAFF_ID, TIME_SPENT) VALUES (${project_id}, ${staff_id}, 0)`
+    `INSERT INTO dbo.EMPLOYEE_PROJECT (PROJECT_ID, EMPLOYEE_ID, TIME_SPENT) VALUES (${project_id}, ${staff_id}, 0)`
   );
   if (ret === undefined) {
     res.status(201).send("Employee assigned to project");
   } else {
-    res.status(400).send("Error");
+    res.status(400).send("Error, staff not assigned to project");
   }
 });
 
@@ -121,15 +121,15 @@ app.get("/Review/:id", async (req, res) =>{
 // Body consists of project_id, employee_id and time_spent
 app.put("/EmployeeProject", async (req, res) => {
   const { project_id } = req.body;
-  const { employee_id } = req.body;
+  const { staff_id } = req.body;
   const { time_spent } = req.body;
   ret = await query(
-    `UPDATE dbo.EMPLOYEE_PROJECT SET TIME_SPENT = TIME_SPENT + ${time_spent} WHERE EMPLOYEE_ID = ${employee_id} AND PROJECT_ID = ${project_id}`
+    `UPDATE dbo.EMPLOYEE_PROJECT SET TIME_SPENT = TIME_SPENT + ${time_spent} WHERE EMPLOYEE_ID = '${staff_id}' AND PROJECT_ID = '${project_id}'`
   );
   if (ret === undefined) {
     res.status(201).send("Time spent on project successfully updated");
   } else {
-    res.status(400).send("Error");
+    res.status(400).send("Error updating time spent");
   }
 });
 
