@@ -154,7 +154,7 @@ app.get("/Time", async (req, res) =>{
   const { end_time } = req.body;
 
   ret = await query(
-    `SELECT * FROM dbo.TIMES WHERE (EMPLOYEE_ID = ${employee_id} AND PROJECT_ID = ${project_id} AND DATE = '${date}') AND ((START_TIME <= '${start_time}' AND END_TIME >= '${end_time}') OR (START_TIME < '${start_time}' AND '${start_time}' < END_TIME) OR (START_TIME < '${end_time}' AND '${end_time}' < END_TIME) OR ('${start_time}' < START_TIME AND '${end_time}' > END_TIME))`
+    `SELECT * FROM dbo.TIMES WHERE (EMPLOYEE_ID = ${employee_id} AND PROJECT_ID = ${project_id} AND DATE = \'${date}\') AND ((START_TIME <= \'${start_time}\' AND END_TIME >= \'${end_time}\') OR (START_TIME < \'${start_time}\' AND \'${start_time}\' < END_TIME) OR (START_TIME < \'${end_time}\' AND \'${end_time}\' < END_TIME) OR (\'${start_time}\' < START_TIME AND \'${end_time}\' > END_TIME))`
   );
   res.status(200).send(ret)
 });
