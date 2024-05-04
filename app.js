@@ -69,14 +69,14 @@ app.post("/Project", async (req, res) => {
     `INSERT INTO dbo.PROJECT (PROJECT_NAME, DESCRIPTION, MANAGER_ID, ESTIMATED_TIME) VALUES ('${project_name}', '${description}', '${manager_id}', ${estimated_time})`
   );
   if (ret === undefined) {
-    res.status(201).send("Project succesfully creeated");
+    res.status(201).send("Project succesfully created");
   } else {
     res.status(400).send("Error, project not created");
   }
 });
 
 // Inserts a new review into the review table 
-// Request body is the id of the person sending the review, the id of the person recieving the review, the review itself and the project id
+// Request body is the id of the person sending the review, the id of the person receiving the review, the review itself and the project id
 app.post("/Review", async (req, res) =>{
   const { review_of } = req.body;
   const { review_by } = req.body;
@@ -118,7 +118,7 @@ app.get("/CreatedReviews/:id", async (req, res) =>{
 }
 );
 
-// Returns all the reviews written of a user
+// Returns all the reviews written about a user
 // The parameter is the employee id
 app.get("/ReceivedReviews/:id", async (req, res) =>{
   const { id } = req.params;
@@ -158,6 +158,8 @@ app.post("/GetTime", async (req, res) =>{
   res.status(200).send(ret)
 });
 
+// Adds time worked on the project into th database
+// Body is the employee_id, the project_id, the current data, the start time and the end time
 app.post("/Time", async (req, res) => {
   const { employee_id } = req.body;
   const { project_id } = req.body;
@@ -171,6 +173,85 @@ app.post("/Time", async (req, res) => {
     res.status(201).send("Time successfully added to database");
   } else {
     res.status(400).send("Error, time not added to database");
+  }
+});
+
+// Inserts a new message into the message table 
+// Request body is the id of the person sending the messsage, the id of the person receiving the message, the message itself and the project id
+app.post("/Message", async (req, res) =>{
+  const { message_sent_by } = req.body;
+  const { message_sent_to } = req.body;
+  const { message_text } = req.body;
+  const { project_id } = req.body;
+  ret = await query(
+    `INSERT INTO dbo.MESSAGES (MESSAGE_SENT_BY,  MESSAGE_SENT_TO, MESSAGE_TEXT, PROJECT_ID) VALUES (${message_sent_by}, ${message_sent_to}, '${message_text}', ${project_id})`
+  );
+  if (ret === undefined) {
+    res.status(201).send("Message successfully created");
+  } else {
+    res.status(400).send(ret);
+  }
+});
+
+// Fetchs the messages sent by an employee 
+// The parameter is the employee id
+app.get("/SentMessages/:id", async (req, res) =>{
+  const { id } = req.params;
+  ret = await query(
+    `SELECT * FROM dbo.MESSAGES WHERE MESSAGE_SENT_BY = ${id}`
+  );
+  res.status(200).send(ret);
+})
+
+// Fetchs the messages sent to an employee 
+// The parameter is the employee id
+app.get("/ReceivedMessages/:id", async (req, res) =>{
+  const { id } = req.params;
+  ret = await query(
+    `SELECT * FROM dbo.MESSAGES WHERE MESSAGE_SENT_TO = ${id}`
+  );
+  res.status(200).send(ret);
+});
+
+// Removes a manager from the database
+// The projects the manager manages are updated so that there manager is NULL (but still exist)
+// The messages sent to and sent by the manager are deleted permanently
+// The manager is deleted from the employee table permanently
+// The parameter is the manager id
+app.delete("/RemoveManager/:id", async (req, res) =>{
+  const { id } = req.params;
+  ret = await query(
+    `UPDATE dbo.PROJECT SET MANAGER_ID = NULL WHERE MANAGER_ID = ${id};
+    DELETE FROM dbo.MESSAGES WHERE MESSAGE_SENT_BY = ${id} OR MESSAGE_SENT_TO = ${id};
+    DELETE FROM EMPLOYEE WHERE EMPLOYEE_ID = ${id};`
+  );
+  if (ret === undefined) {
+    res.status(200).send("Manager successfully removed");
+  } else {
+    res.status(400).send(ret);
+  }
+});
+
+// Removes a staff member from the database 
+// The staff is unassigned from all projects
+// The reviews written by and written about the staff member are deleted permanently
+// The messages sent by and sent to the staff member are deleted permanently
+// The times entered by a staff are deleted permanently
+// The staff member is deleted from the employee table permanently
+// The parameter is the staff id
+app.delete("/RemoveStaff/:id", async(req, res) =>{
+  const { id } = req.params;
+  ret = await query(
+    `DELETE FROM dbo.EMPLOYEE_PROJECT WHERE EMPLOYEE_ID = ${id};
+    DELETE FROM dbo.REVIEW WHERE REVIEW_OF = ${id} OR REVIEW_BY = ${id};
+    DELETE FROM dbo.MESSAGES WHERE MESSAGE_SENT_BY = ${id} OR MESSAGE_SENT_TO = ${id};
+    DELETE FROM dbo.TIMES WHERE EMPLOYEE_ID = ${id};
+    DELETE FROM EMPLOYEE WHERE EMPLOYEE_ID = ${id};`
+  );
+  if (ret === undefined) {
+    res.status(200).send("Employee successfully removed");
+  } else {
+    res.status(400).send(ret);
   }
 });
 
