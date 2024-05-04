@@ -140,7 +140,7 @@ app.put("/EmployeeProject", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Time spent on project successfully updated");
   } else {
-    res.status(400).send("Error updating time spent");
+    res.status(400).send(ret);
   }
 });
 
@@ -172,7 +172,7 @@ app.post("/Time", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Time successfully added to database");
   } else {
-    res.status(400).send("Error, time not added to database");
+    res.status(400).send(ret);
   }
 });
 
