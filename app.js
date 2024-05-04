@@ -71,7 +71,7 @@ app.post("/Project", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Project succesfully created");
   } else {
-    res.status(400).send("Error, project not created");
+    res.status(400).send("Error: project not created");
   }
 });
 
@@ -88,7 +88,7 @@ app.post("/Review", async (req, res) =>{
   if (ret === undefined) {
     res.status(201).send("Review successfully created");
   } else {
-    res.status(400).send("Error, review not created");
+    res.status(400).send("Error: review not created");
   }
 });
 
@@ -103,7 +103,7 @@ app.post("/EmployeeProject", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Employee assigned to project");
   } else {
-    res.status(400).send("Error, staff not assigned to project");
+    res.status(400).send("Error: staff not assigned to project");
   }
 });
 
@@ -140,7 +140,7 @@ app.put("/EmployeeProject", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Time spent on project successfully updated");
   } else {
-    res.status(400).send(ret);
+    res.status(400).send("Error: time spent on project not updated");
   }
 });
 
@@ -172,7 +172,7 @@ app.post("/Time", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Time successfully added to database");
   } else {
-    res.status(400).send(ret);
+    res.status(400).send("Error: time not added to database");
   }
 });
 
@@ -189,7 +189,7 @@ app.post("/Message", async (req, res) =>{
   if (ret === undefined) {
     res.status(201).send("Message successfully created");
   } else {
-    res.status(400).send(ret);
+    res.status(400).send("Error: message not created");
   }
 });
 
@@ -228,7 +228,7 @@ app.delete("/RemoveManager/:id", async (req, res) =>{
   if (ret === undefined) {
     res.status(200).send("Manager successfully removed");
   } else {
-    res.status(400).send(ret);
+    res.status(400).send("Error: manager not removed");
   }
 });
 
@@ -251,7 +251,34 @@ app.delete("/RemoveStaff/:id", async(req, res) =>{
   if (ret === undefined) {
     res.status(200).send("Employee successfully removed");
   } else {
-    res.status(400).send(ret);
+    res.status(400).send("Error: employee not removed");
+  }
+});
+
+// Fetches all meals for an entered day from the database
+// Parameter is the date that the meal is for
+app.get("/Meal/:date", async (req, res) =>{
+  const { date } = req.params;
+  
+  ret = await query(
+    `SELECT * FROM dbo.MEALS WHERE DATE = '${date}'`
+  );
+  res.status(200).send(ret);
+});
+
+// Adds a meal to the database
+// Body consits of meal name, meal description and the date
+app.post("/Meal", async (req, res) =>{
+  const { meal_name } = req.body;
+  const { meal_description } = req.body;
+  const { date } = req.body;
+  ret = await query(
+    `INSERT INTO dbo.MEALS (MEAL_NAME,  MEAL_DESCRIPTION, DATE) VALUES ('${meal_name}', '${meal_description}', '${date}')`
+  );
+  if (ret === undefined) {
+    res.status(201).send("Meal option successfully created");
+  } else {
+    res.status(400).send("Error: meal option not created");
   }
 });
 
