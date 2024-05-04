@@ -184,9 +184,10 @@ app.post("/Message", async (req, res) =>{
   const { message_text } = req.body;
   const { project_id } = req.body;
   const { time } = req.body;
+  const { date } = req.body;
 
   ret = await query(
-    `INSERT INTO dbo.MESSAGES (MESSAGE_SENT_BY,  MESSAGE_SENT_TO, MESSAGE_TEXT, PROJECT_ID, TIME) VALUES (${message_sent_by}, ${message_sent_to}, '${message_text}', ${project_id}, '${time}')`
+    `INSERT INTO dbo.MESSAGES (MESSAGE_SENT_BY,  MESSAGE_SENT_TO, MESSAGE_TEXT, PROJECT_ID, TIME, DATE) VALUES (${message_sent_by}, ${message_sent_to}, '${message_text}', ${project_id}, '${time}', '${date}')`
   );
   if (ret === undefined) {
     res.status(201).send("Message successfully created");
