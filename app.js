@@ -22,6 +22,11 @@ app.get('/Project', async (req, res) => {
   res.status(200).send(ret);
 });
 
+app.get('/Project/:name', async (req, res)=>{
+  const name = req.params.id;
+  ret = await query(`SELECT * FROM dbo.PROJECT WHERE PROJECT_NAME = '${name}'`)
+});
+
 // Returns all entries in the employee project database
 app.get('/EmployeeProject', async (req, res) => {
   ret = await query(`SELECT * FROM dbo.EMPLOYEE_PROJECT`);
