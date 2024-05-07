@@ -180,14 +180,13 @@ app.post("/Time", async (req, res) => {
 // Request body is the id of the person sending the messsage, the id of the person receiving the message, the message itself and the project id
 app.post("/Message", async (req, res) =>{
   const { message_sent_by } = req.body;
-  const { message_sent_to } = req.body;
   const { message_text } = req.body;
   const { project_id } = req.body;
   const { time } = req.body;
   const { date } = req.body;
 
   ret = await query(
-    `INSERT INTO dbo.MESSAGES (MESSAGE_SENT_BY,  MESSAGE_SENT_TO, MESSAGE_TEXT, PROJECT_ID, TIME, DATE) VALUES (${message_sent_by}, ${message_sent_to}, '${message_text}', ${project_id}, '${time}', '${date}')`
+    `INSERT INTO dbo.MESSAGES (MESSAGE_SENT_BY, MESSAGE_TEXT, PROJECT_ID, TIME, DATE) VALUES (${message_sent_by}, '${message_text}', ${project_id}, '${time}', '${date}')`
   );
   if (ret === undefined) {
     res.status(201).send("Message successfully created");
@@ -205,16 +204,6 @@ app.get("/SentMessages/:id", async (req, res) =>{
   );
   res.status(200).send(ret);
 })
-
-// Fetchs the messages sent to an employee 
-// The parameter is the employee id
-app.get("/ReceivedMessages/:id", async (req, res) =>{
-  const { id } = req.params;
-  ret = await query(
-    `SELECT * FROM dbo.MESSAGES WHERE MESSAGE_SENT_TO = ${id}`
-  );
-  res.status(200).send(ret);
-});
 
 app.get("/ProjectMessages/:id", async (req, res) =>{
   const { id } = req.params;
@@ -234,7 +223,7 @@ app.delete("/RemoveManager/:id", async (req, res) =>{
   const { id } = req.params;
   ret = await query(
     `UPDATE dbo.PROJECT SET MANAGER_ID = NULL WHERE MANAGER_ID = ${id};
-    DELETE FROM dbo.MESSAGES WHERE MESSAGE_SENT_BY = ${id} OR MESSAGE_SENT_TO = ${id};
+    DELETE FROM dbo.MESSAGES WHERE MESSAGE_SENT_BY = ${id};
     DELETE FROM EMPLOYEE WHERE EMPLOYEE_ID = ${id};`
   );
   if (ret === undefined) {
@@ -256,7 +245,7 @@ app.delete("/RemoveStaff/:id", async(req, res) =>{
   ret = await query(
     `DELETE FROM dbo.EMPLOYEE_PROJECT WHERE EMPLOYEE_ID = ${id};
     DELETE FROM dbo.REVIEW WHERE REVIEW_OF = ${id} OR REVIEW_BY = ${id};
-    DELETE FROM dbo.MESSAGES WHERE MESSAGE_SENT_BY = ${id} OR MESSAGE_SENT_TO = ${id};
+    DELETE FROM dbo.MESSAGES WHERE MESSAGE_SENT_BY = ${id};
     DELETE FROM dbo.TIMES WHERE EMPLOYEE_ID = ${id};
     DELETE FROM EMPLOYEE WHERE EMPLOYEE_ID = ${id};`
   );
