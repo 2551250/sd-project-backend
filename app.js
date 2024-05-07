@@ -51,12 +51,10 @@ app.get('/EmployeeProject/Project/:id', async (req, res) => {
 // Returns the projects created by a manager 
 // The parameter is the manager id 
 app.get('/Project/:id', async (req, res) => {
-  console.log("REACHED")
   const id = req.params.id;
   ret = await query(
     `SELECT * FROM dbo.PROJECT WHERE MANAGER_ID = ${id}`
   );
-  console.log(ret);
   res.status(200).send(ret);
 });
 
@@ -217,6 +215,15 @@ app.get("/ReceivedMessages/:id", async (req, res) =>{
   );
   res.status(200).send(ret);
 });
+
+app.get("/ProjectMessages/:id", async (req, res) =>{
+  const { id } = req.params;
+  ret = await query(
+    `SELECT * FROM dbo.MESSAGES WHERE PROJECT_ID = ${id}`
+  );
+  res.status(200).send(ret);
+});
+
 
 // Removes a manager from the database
 // The projects the manager manages are updated so that there manager is NULL (but still exist)
