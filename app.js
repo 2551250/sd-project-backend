@@ -140,7 +140,7 @@ app.put("/EmployeeProject", async (req, res) => {
   if (ret === undefined) {
     res.status(201).send("Time spent on project successfully updated");
   } else {
-    res.status(400).send("Error: time spent on project not updated");
+    res.status(400).send(ret);
   }
 });
 
