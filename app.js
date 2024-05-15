@@ -224,6 +224,7 @@ app.delete("/RemoveManager/:id", async (req, res) =>{
   ret = await query(
     `UPDATE dbo.PROJECT SET MANAGER_ID = NULL WHERE MANAGER_ID = ${id};
     DELETE FROM dbo.MESSAGES WHERE MESSAGE_SENT_BY = ${id};
+    DELETE FROM dbo.BOOKINGS WHERE EMPLOYEE_ID = ${id};
     DELETE FROM EMPLOYEE WHERE EMPLOYEE_ID = ${id};`
   );
   if (ret === undefined) {
@@ -247,6 +248,7 @@ app.delete("/RemoveStaff/:id", async(req, res) =>{
     DELETE FROM dbo.REVIEW WHERE REVIEW_OF = ${id} OR REVIEW_BY = ${id};
     DELETE FROM dbo.MESSAGES WHERE MESSAGE_SENT_BY = ${id};
     DELETE FROM dbo.TIMES WHERE EMPLOYEE_ID = ${id};
+    DELETE FROM dbo.BOOKINGS WHERE EMPLOYEE_ID = ${id};
     DELETE FROM EMPLOYEE WHERE EMPLOYEE_ID = ${id};`
   );
   if (ret === undefined) {
@@ -280,6 +282,43 @@ app.post("/Meal", async (req, res) =>{
     res.status(201).send("Meal option successfully created");
   } else {
     res.status(400).send("Error: meal option not created");
+  }
+});
+
+// Returns all meal bookings made by that employee
+// Parameter is the employee id
+app.get("/BookingByEmployee/:id", async (req, res) =>{
+  const { id } = req.params;
+
+  ret = await query(
+    `SELECT dbo.BOOKINGS.EMPLOYEE_ID, dbo.MEALS.MEAL_ID, MEAL_NAME, MEAL_DESCRIPTION, DATE FROM dbo.BOOKINGS INNER JOIN dbo.MEALS ON dbo.MEALS.MEAL_ID = dbo.BOOKINGS.MEAL_ID WHERE EMPLOYEE_ID = '${id}'`
+  );
+  res.status(200).send(ret);
+});
+
+// Returns all booking of that meal
+// Parameter is the meal id
+app.get("/BookingByMeal/:id", async (req, res) =>{
+  const { id } = req.params;
+
+  ret = await query(
+    `SELECT dbo.EMPLOYEE.EMPLOYEE_ID, NAME, SURNAME FROM dbo.BOOKINGS INNER JOIN dbo.EMPLOYEE ON dbo.EMPLOYEE.EMPLOYEE_ID = dbo.BOOKINGS.EMPLOYEE_ID WHERE MEAL_ID = '${id}'`
+  );
+  res.status(200).send(ret);
+});
+
+// Creates a new booking for a meal
+// Request body is employee id and meal id
+app.post("/Booking", async (req, res) =>{
+  const { employee_id } = req.body;
+  const { meal_id } = req.body;
+  ret = await query(
+    `INSERT INTO dbo.BOOKINGS(EMPLOYEE_ID,  MEAL_ID) VALUES (${employee_id}, ${meal_id})`
+  );
+  if (ret === undefined) {
+    res.status(201).send("Booking successfully created");
+  } else {
+    res.status(400).send("Error: booking not created");
   }
 });
 
