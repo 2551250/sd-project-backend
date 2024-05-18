@@ -158,7 +158,7 @@ app.post("/GetTime", async (req, res) =>{
   res.status(200).send(ret)
 });
 
-// Adds time worked on the project into th database
+// Adds time worked on the project into the database
 // Body is the employee_id, the project_id, the current data, the start time and the end time
 app.post("/Time", async (req, res) => {
   const { employee_id } = req.body;
@@ -320,6 +320,33 @@ app.post("/Booking", async (req, res) =>{
   } else {
     res.status(400).send("Error: booking not created");
   }
+});
+
+// Parameter is the project id
+// Returns the time spent each day by each employee for the indicated project per day
+// The time spent on each day is returned
+app.get("/TimeSpentByProjectByDate/:project_id", async (req, res) =>{
+  const { project_id } = req.params;
+  ret = await query(
+    `SELECT EMPLOYEE.EMPLOYEE_ID, NAME, SURNAME, PROJECT_ID, DATE, SUM(DATEDIFF(MINUTE, START_TIME, END_TIME)) * 1.0 / 60 AS TIME
+    FROM dbo.EMPLOYEE INNER JOIN dbo.TIMES ON EMPLOYEE.EMPLOYEE_ID = TIMES.EMPLOYEE_ID
+    WHERE PROJECT_ID = ${project_id}
+    GROUP BY EMPLOYEE.EMPLOYEE_ID, NAME, SURNAME, DATE, PROJECT_ID`
+  );
+  res.status(200).send(ret);
+});
+
+// Parameter is the project id 
+// Returns the time spent by each employee over all days
+app.get("/TimeSpentByProjectCumulative/:project_id", async (req, res) =>{
+  const { project_id } = req.params;
+  ret = await query(
+    `SELECT EMPLOYEE.EMPLOYEE_ID, NAME, SURNAME, PROJECT_ID, SUM(DATEDIFF(MINUTE, START_TIME, END_TIME)) * 1.0 / 60 AS TIME
+    FROM dbo.EMPLOYEE INNER JOIN dbo.TIMES ON EMPLOYEE.EMPLOYEE_ID = TIMES.EMPLOYEE_ID
+    WHERE PROJECT_ID = ${project_id}
+    GROUP BY EMPLOYEE.EMPLOYEE_ID, NAME, SURNAME, PROJECT_ID`
+  );
+  res.status(200).send(ret);
 });
 
 const config = {
