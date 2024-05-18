@@ -286,12 +286,13 @@ app.post("/Meal", async (req, res) =>{
 });
 
 // Returns all meal bookings made by that employee
-// Parameter is the employee id
-app.get("/BookingByEmployee/:id", async (req, res) =>{
-  const { id } = req.params;
+// Body is the employee id and date
+app.post("/BookingByEmployee", async (req, res) =>{
+  const { id } = req.body;
+  const { date } = req.body
 
   ret = await query(
-    `SELECT dbo.BOOKINGS.EMPLOYEE_ID, dbo.MEALS.MEAL_ID, MEAL_NAME, MEAL_DESCRIPTION, DATE FROM dbo.BOOKINGS INNER JOIN dbo.MEALS ON dbo.MEALS.MEAL_ID = dbo.BOOKINGS.MEAL_ID WHERE EMPLOYEE_ID = '${id}'`
+    `SELECT dbo.BOOKINGS.EMPLOYEE_ID, dbo.MEALS.MEAL_ID, MEAL_NAME, MEAL_DESCRIPTION, DATE FROM dbo.BOOKINGS INNER JOIN dbo.MEALS ON dbo.MEALS.MEAL_ID = dbo.BOOKINGS.MEAL_ID WHERE EMPLOYEE_ID = ${id} AND DATE = '${date}'`
   );
   res.status(200).send(ret);
 });
