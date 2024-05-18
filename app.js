@@ -349,6 +349,17 @@ app.get("/TimeSpentByProjectCumulative/:project_id", async (req, res) =>{
   res.status(200).send(ret);
 });
 
+app.get("/TimeSpentTotal/:project_id", async (req, res) =>{
+  const { project_id } = req.params;
+  ret = await query(
+    `SELECT DBO.PROJECT.PROJECT_ID, ESTIMATED_TIME, ISNULL(SUM(TIME_SPENT), 0) AS TIME_SPENT
+    FROM dbo.PROJECT LEFT JOIN EMPLOYEE_PROJECT ON dbo.PROJECT.PROJECT_ID = dbo.EMPLOYEE_PROJECT.PROJECT_ID
+    WHERE dbo.PROJECT.PROJECT_ID = ${project_id}
+    GROUP BY DBO.PROJECT.PROJECT_ID, ESTIMATED_TIME`
+  );
+  res.status(200).send(ret);
+});
+
 const config = {
   user: 'workwise-backend-server-admin',
   password: 'projectpassword1@3',
