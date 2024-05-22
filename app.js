@@ -69,7 +69,7 @@ app.post("/Project", async (req, res) => {
     `INSERT INTO dbo.PROJECT (PROJECT_NAME, DESCRIPTION, MANAGER_ID, ESTIMATED_TIME) VALUES ('${project_name}', '${description}', '${manager_id}', ${estimated_time})`
   );
   if (ret === undefined) {
-    res.status(201).send("Project succesfully created");
+    res.status(201).send("Project successfully created");
   } else {
     res.status(400).send("Error: project not created");
   }
