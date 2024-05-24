@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3001;
 const sql = require('mssql');
+const crypto = require('crypto');
 
 app.use(express.json());
 
@@ -12,7 +13,24 @@ app.get('/', async (req, res) => {
 
 // Returns all employees in the database
 app.get('/Employee', async (req, res) => {
-  ret = await query(`SELECT * FROM dbo.EMPLOYEE;`);
+  ret = await query(`SELECT EMPLOYEE_ID, EMAIL, NAME, SURNAME, ROLE FROM dbo.EMPLOYEE;`);
+  res.status(200).send(ret);
+});
+
+app.put('/VerifyLogin', async (req, res) => {
+  const { email } = req.body;
+  const { password } = req.body;
+  let salt = "";
+  const temp = await query(`SELECT SALT FROM dbo.EMPLOYEE WHERE EMAIL = '${email}'`);
+  if( temp.length !== 0){
+    salt = temp[0].SALT;
+  }
+  if(salt == null){
+    salt = "";
+  }
+  const hashed_password = crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString(`hex`);
+  ret = await query(`SELECT EMPLOYEE_ID, EMAIL, NAME, SURNAME, ROLE FROM dbo.EMPLOYEE
+  WHERE EMAIL = '${email}' and PASSWORD = '${hashed_password}';`);
   res.status(200).send(ret);
 });
 
@@ -358,6 +376,21 @@ app.get("/TimeSpentTotal/:project_id", async (req, res) =>{
     GROUP BY DBO.PROJECT.PROJECT_ID, ESTIMATED_TIME`
   );
   res.status(200).send(ret);
+});
+
+app.put("/Password", async (req, res) => {
+  const { password } = req.body;
+  const { email } = req.body;
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hashed_password = crypto.pbkdf2Sync(password, salt, 1000, 64, `sha512`).toString('hex');
+  ret = await query(
+    `UPDATE dbo.EMPLOYEE SET PASSWORD = '${hashed_password}', SALT = '${salt}' WHERE EMAIL = '${email}'`
+  );
+  if (ret === undefined) {
+    res.status(201).send("Password successfully updated");
+  } else {
+    res.status(400).send(ret);
+  }
 });
 
 const config = {
