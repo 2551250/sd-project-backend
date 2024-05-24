@@ -3,7 +3,11 @@ const app = express();
 const port = process.env.PORT || 3001;
 const sql = require('mssql');
 const crypto = require('crypto');
-
+const cors = require('cors');
+const corsOptions = {
+  origin: '*'
+}
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Default API endpoint
